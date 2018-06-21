@@ -1032,9 +1032,9 @@ const data = {
 const data = {
   a: {
     b: 1,
-    __ob__: {value, dep, vmCount}
+    __ob__: {a, dep, vmCount}
   },
-  __ob__: {value, dep, vmCount}
+  __ob__: {data, dep, vmCount}
 }
 ```
 
