@@ -1204,7 +1204,7 @@ platformGetTagNamespace('svg')  // 'svg'
 
 总之在 `start` 钩子函数内部首先会尝获取一个元素的命名空间，并将获取到的命名空间的名字赋值给 `ns` 常量，这个常量在后面会用到。
 
-再获取命名空间之后，执行的是如下这段 `if` 条件语句块：
+在获取命名空间之后，执行的是如下这段 `if` 条件语句块：
 
 ```js
 if (isIE && ns === 'svg') {
@@ -1309,7 +1309,7 @@ if (ns) {
 
 通过如上代码可知，如果当前解析的开始标签为 `svg` 标签或者 `math` 标签或者它们两个的子节点标签，都将会比其他 `html` 标签的元素描述对象多出一个 `ns` 属性，且该属性标识了该标签的命名空间。
 
-在往下是这样一段代码：
+再往下是这样一段代码：
 
 ```js
 if (isForbiddenTag(element) && !isServerRendering()) {
@@ -1359,9 +1359,9 @@ for (let i = 0; i < preTransforms.length; i++) {
 }
 ```
 
-如上代码中使用 `for` 循环遍历了 `preTransforms` 数组，我们知道 `preTransforms` 是通过 `pluckModuleFunction` 函数从 `options.modules` 选项中筛选出名字为 `preTransformNode` 函数所组成的数组。该数组中每个元素都是一个函数，所以如上代的 `for` 循环内部直接调用了 `preTransforms` 数组中的每一个函数并为这些函数传递了两个参数，分别是当前元素描述对象(`element`)以及编译器选项(`options`)。
+如上代码中使用 `for` 循环遍历了 `preTransforms` 数组，我们知道 `preTransforms` 是通过 `pluckModuleFunction` 函数从 `options.modules` 选项中筛选出名字为 `preTransformNode` 函数所组成的数组。该数组中每个元素都是一个函数，所以如上的 `for` 循环内部直接调用了 `preTransforms` 数组中的每一个函数并为这些函数传递了两个参数，分别是当前元素描述对象(`element`)以及编译器选项(`options`)。
 
-这里我们简单的说一下 `preTransforms` 数组中的函数的作用，其实本质上这些函数的作用与我们之前见到过的 `process*` 系列的函数没什么区别，都是用来对当前元素描述对象做进一步处理。不仅仅是 `preTransforms` 数组，对于 `transforms` 数组和 `postTransforms` 数组也是一样的，它们之间的却别就像它们的名字一样，根据不同的调用时机为它们定义了相应的名字。那么为什么把这三个数组中的处理函数与当前文件中 `process*` 系列函数区分开呢？这是出于平台化的考虑，通过前面的分析我们知道 `preTransforms` 数组中的那些 `preTransformNode` 函数来由 `src/platforms/web/compiler/modules` 目录下定义的一些文件定义的，根据目录路径可知这些代码应该是用来处理 `web` 平台相关逻辑的，除了 `web` 平台之外我们也可以看到 `weex` 平台下相应的代码，你在源码中是能够找到这个目录的：`src/platforms/weex/compiler/modules`。
+这里我们简单的说一下 `preTransforms` 数组中的函数的作用，其实本质上这些函数的作用与我们之前见到过的 `process*` 系列的函数没什么区别，都是用来对当前元素描述对象做进一步处理。不仅仅是 `preTransforms` 数组，对于 `transforms` 数组和 `postTransforms` 数组也是一样的，它们之间的区别就像它们的名字一样，根据不同的调用时机为它们定义了相应的名字。那么为什么把这三个数组中的处理函数与当前文件中 `process*` 系列函数区分开呢？这是出于平台化的考虑，通过前面的分析我们知道 `preTransforms` 数组中的那些 `preTransformNode` 函数来由 `src/platforms/web/compiler/modules` 目录下定义的一些文件定义的，根据目录路径可知这些代码应该是用来处理 `web` 平台相关逻辑的，除了 `web` 平台之外我们也可以看到 `weex` 平台下相应的代码，你在源码中是能够找到这个目录的：`src/platforms/weex/compiler/modules`。
 
 总之你只需要知道 `preTransforms` 数组中的那些函数与 `process*` 系列函数唯一的区别就是平台化的区分即可了。
 
@@ -1431,7 +1431,7 @@ if (!root) {
 
 `if` 语句块的判断条件是如果 `root` 不存在则执行语句块内的代码，我们知道 `root` 变量在一开始是不存在的，如果 `root` 不存在那说明当前元素应该就是根元素，所以在 `if` 语句块内直接将当前元素的描述对象 `element` 赋值给 `root` 变量，同时会调用上面刚刚讲过的 `checkRootConstraints` 函数检查根元素是否符合要求。
 
-我们再来看 `elseif` 语句的条件，它检测了 `stack.length` 是否不为 `0`，也就是说 `stack` 数组不为空的情况下会执行 `elseif` 语句块内的代码。我们想一下当前元素 `stack` 数组不为空并且当前正在解析开始标签，这说明什么问题？要想知道这个问题我们首先要知道 `stack` 数组的作用，前面已经多次提到每当遇到一个非一元标签时就会将该标签的描述对象条件到数组，并且每当遇到一个结束标签时都会将该标签的描述对象从 `stack` 数组中拿掉，那也就是说在只有一个根元素的情况下，正常解析完成一段 `html` 代码后 `stack` 数组应该为空。但此时不为空，那只能说明一件事情，即有多个根元素。
+我们再来看 `elseif` 语句的条件，它检测了 `stack.length` 是否不为 `0`，也就是说 `stack` 数组不为空的情况下会执行 `elseif` 语句块内的代码。我们想一下当前元素 `stack` 数组不为空并且当前正在解析开始标签，这说明什么问题？要想知道这个问题我们首先要知道 `stack` 数组的作用，前面已经多次提到每当遇到一个非一元标签时就会将该标签的描述对象放进数组，并且每当遇到一个结束标签时都会将该标签的描述对象从 `stack` 数组中拿掉，那也就是说在只有一个根元素的情况下，正常解析完成一段 `html` 代码后 `stack` 数组应该为空。但此时不为空，那只能说明一件事情，即有多个根元素。
 
 如果有多个根元素，则会执行 `elseif` 语句块内的代码，如下：
 
@@ -1588,141 +1588,6 @@ if (root.if && (element.elseif || element.else)) {
 ```
 
 可以看到，在 `elseif` 语句块内通过 `warnOnce` 函数打印了警告信息给开发者友好的提示。
-
-再往下是如下这段 `if` 条件语句块：
-
-```js
-if (currentParent && !element.forbidden) {
-  // 省略...
-}
-```
-
-不过我们暂时跳过它，我们优先看一下 `start` 钩子函数的最后的一段代码，如下：
-
-```js
-if (!unary) {
-  currentParent = element
-  stack.push(element)
-} else {
-  closeElement(element)
-}
-```
-
-如上这段代码是一个 `if...else` 条件分支语句块，我们首先看 `if` 语句的条件，它检测了当前元素是否是非一元标签，前面我们说过了如果一个元素是非一元的，那么应该将该元素的描述对象添加到 `stack` 栈中，并且将 `currentParent` 变量的值更新为当前元素的描述对象，如上代码中 `if` 语句块内的代码说明了一切。
-
-反之，如果一个元素是一元标签，那么应该调用 `closeElement` 函数闭合该元素。对于 `closeElement` 函数我们后面再详细说，现在我们需要重点关注 `if` 语句块内的两句代码，通过这两句代码我们至少能得到一个总结：**每当遇到一个非一元标签都会将该元素的描述对象添加到 `stack` 数组，并且 `currentParent` 始终存储的是 `stack` 栈顶的元素，即当前解析元素的父级**。
-
-知道了这些我们在回头来看如下代码：
-
-```js
-if (currentParent && !element.forbidden) {
-  // 省略...
-}
-```
-
-首先观察该 `if` 条件语句的判断条件：
-
-```js
-currentParent && !element.forbidden
-```
-
-如果这个条件成立，则说明当前元素存在父级(`currentParent`)，并且当前元素不是被禁止的元素。只有在这种情况下才会执行该 `if` 条件语句块内的代码。在 `if` 语句块内是如下代码：
-
-```js
-if (element.elseif || element.else) {
-  processIfConditions(element, currentParent)
-} else if (element.slotScope) { // scoped slot
-  currentParent.plain = false
-  const name = element.slotTarget || '"default"'
-  ;(currentParent.scopedSlots || (currentParent.scopedSlots = {}))[name] = element
-} else {
-  currentParent.children.push(element)
-  element.parent = currentParent
-}
-```
-
-在如上这段代码中，最关键的代码应该是 `else` 语句块内的代码：
-
-```js {6-7}
-if (element.elseif || element.else) {
-  // 省略...
-} else if (element.slotScope) { // scoped slot
-  // 省略...
-} else {
-  currentParent.children.push(element)
-  element.parent = currentParent
-}
-```
-
-在 `else` 语句块内，会把当前元素描述对象添加到父级元素描述对象(`currentParent`)的 `children` 数组中，同时将当前元素对象的 `parent` 属性指向父级元素对象，这样就建立了元素描述对象间的父子级关系。
-
-但是就像我们前面讲过的，如果一个标签使用 `v-else-if` 或 `v-else` 指令，那么该元素的描述对象实际上会被添加到对应的 `v-if` 元素描述对象的 `ifConditions` 数组中，而非作为一个独立的子节点，这个工作就是由如上代码中 `if` 语句块的代码完成的：
-
-```js {2}
-if (element.elseif || element.else) {
-  processIfConditions(element, currentParent)
-} else if (element.slotScope) { // scoped slot
-  // 省略...
-} else {
-  // 省略...
-}
-```
-
-如上代码所示的 `if` 语句的条件可知，如果当前元素使用了 `v-else-if` 或 `v-else` 指令，则会调用 `processIfConditions` 函数，同时将当前元素描述对象 `element` 和父级元素的描述对象 `currentParent` 作为参数传递，我们来看看 `processIfConditions` 函数做了什么，如下是 `processIfConditions` 函数的源码：
-
-```js
-function processIfConditions (el, parent) {
-  const prev = findPrevElement(parent.children)
-  if (prev && prev.if) {
-    addIfCondition(prev, {
-      exp: el.elseif,
-      block: el
-    })
-  } else if (process.env.NODE_ENV !== 'production') {
-    warn(
-      `v-${el.elseif ? ('else-if="' + el.elseif + '"') : 'else'} ` +
-      `used on element <${el.tag}> without corresponding v-if.`
-    )
-  }
-}
-```
-
-在 `processIfConditions` 函数内部，首先通过 `findPrevElement` 函数找到当前元素的前一个元素描述对象，并将其赋值给 `prev` 常量，接着进入 `if` 条件语句，判断当前元素的前一个元素是否使用了 `v-if` 指令，我们知道对于使用了 `v-else-if` 或 `v-else` 指令的元素来讲，他们的前一个元素必然需要使用相符的 `v-if` 指令才行。如果前一个元素确实使用 `v-if` 指令，那么则会调用 `addIfCondition` 函数将当前元素描述对象添加到前一个元素的的 `ifConditions` 数组中。如果前一个元素没有使用 `v-if` 指令，那么此时将会进入 `else...if` 条件语句的判断，即如果是非生产环境下，会打印警告信息提示开发者没有相符的使用了 `v-if` 指令的元素。
-
-以上是当前元素使用了 `v-else-if` 或 `v-else` 指令时的特殊处理，由此可知**当一个元素使用了 `v-else-if` 或 `v-else` 指令时，它们是不会作为父级元素字节点的**，而是会被添加到相符的使用了 `v-if` 指令的元素描述对象的 `ifConditions` 数组中。
-
-如果当前元素没有使用 `v-else-if` 或 `v-else` 指令，那么还会判断当前元素是否使用了 `slot-scope` 特性，如下：
-
-```js {6}
-if (element.elseif || element.else) {
-  // 省略...
-} else if (element.slotScope) { // scoped slot
-  currentParent.plain = false
-  const name = element.slotTarget || '"default"'
-  ;(currentParent.scopedSlots || (currentParent.scopedSlots = {}))[name] = element
-} else {
-  // 省略...
-}
-```
-
-如上代码高亮代码所示，如果一个元素使用了 `slot-scope` 特性，那么该元素的描述对象会被添加到父级元素的 `scopedSlots` 对象下，也就是说使用了 `slot-scope` 特性的元素与使用了 `v-else-if` 或 `v-else` 指令的元素一样，他们都不会作为父级元素的子节点，对于使用了 `slot-scope` 特性的元素来讲它们将被添加到父级元素描述的 `scopedSlots` 对象下。另外由于如上代码中 `elseif` 语句块涉及 `slot-scope` 相关的处理，我们打算放到后面统一讲解。
-
-到目前为止，我们大概粗略的过了一遍 `start` 钩子函数的内容，接下来我们做一些总结，以使得我们的思路更加清晰：
-
-* 1、`start` 钩子函数是当解析 `html` 字符串遇到开始标签时被调用的。
-* 2、模板中禁止使用 `<style>` 标签和那些没有指定 `type` 属性或 `type` 属性值为 `text/javascript` 的 `<script>` 标签。
-* 3、在 `start` 钩子函数中会调用前置处理函数，这些前置处理函数都放在 `preTransforms` 数组中，这么做的目的是为不同平台提供对应平台下的解析工作。
-* 4、前置处理函数执行完后会调用一些列 `process*` 类函数继续对元素描述对象进行加工。
-* 5、通过判断 `root` 是否存在来判断当前解析的元素是否为根元素。
-* 6、`slot` 标签和 `template` 标签不能作为根元素，并且根元素不能使用 `v-for` 指令。
-* 7、可以定义多个根元素，但必须使用 `v-if`、`v-else-if` 以及 `v-else` 保证有且仅有一个根元素被渲染。
-* 8、构建 `AST` 并建立父子级关系是在 `start` 钩子函数中完成的，每当遇到非一元标签，会把它存到 `currentParent` 变量中，当解析该标签的子节点时通过访问 `currentParent` 变量获取父级元素。
-* 9、如果一个元素使用了 `v-else-if` 或 `v-else` 指令，则该元素不会作为子节点，而是会被添加到相符的使用了 `v-if` 指令的元素描述对象的 `ifConditions` 数组中。
-* 10、如果以元素使用了 `slot-scope` 特性，则该元素也不会作为子节点，它会被添加到父级元素描述对象的 `scopedSlots` 属性中。
-* 11、对于没有使用条件指令或 `slot-scope` 特性的元素，会正常建立父子级关系。
-
-以上的总结就是 `start` 钩子函数在处理开始标签时所做的事情，实际上由于开始标签中包含了大量指令信息(如 `v-if` 等)或特性信息(如 `slot-scope` 等)，所以在生产 `AST` 过程中，大部分工作都是由 `start` 函数来完成的，接下来我们将更加细致的去讲解解析过程中的每一个细节。
-
 
 
 ### 增强的 class
